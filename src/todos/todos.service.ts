@@ -14,7 +14,6 @@ export class TodosService {
 
   async create(createTodoDto: CreateTodoDto) {
     try {
-      console.log('[DEBUG] Received DTO:', JSON.stringify(createTodoDto));
 
       let dueDate: Date;
       if (createTodoDto['date'] && createTodoDto['time']) {
@@ -30,7 +29,6 @@ export class TodosService {
 
       if (inputPeriod === 'auto') {
         finalPeriod = this.calculatePeriod(dueDate);
-        console.log(`[DEBUG] Auto-calculated period: ${finalPeriod}`);
       } else if (inputPeriod === 'none' || inputPeriod === '') {
         finalPeriod = '';
       } else {
@@ -43,9 +41,6 @@ export class TodosService {
         period: finalPeriod,
       });
 
-      console.log(
-        `[DEBUG] Final Save - title: "${todo.title}", period: "${todo.period}"`,
-      );
       return await this.todoRepository.save(todo);
     } catch (error) {
       console.error('Error creating todo:', error);

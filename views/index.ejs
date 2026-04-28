@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>forY - モダンTodo</title>
+    <title>やることリスト</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -18,6 +18,12 @@
             --danger: #ef4444;
             --danger-hover: #dc2626;
             --border: #e2e8f0;
+            --overdue-bg: #fff1f2;
+            --overdue-border: #fecdd3;
+            --overdue-text: #e11d48;
+            --approaching-bg: #fefce8;
+            --approaching-border: #fef08a;
+            --approaching-text: #a16207;
         }
 
         * {
@@ -56,11 +62,29 @@
 
         .todo-list {
             list-style: none;
-            padding: 0.75rem 1rem;
+            padding: 0.75rem;
             margin: 0;
             background: #f1f5f9;
             border: 1px solid var(--border);
             border-radius: 16px;
+            max-height: 420px; /* 6個程度が見える高さ */
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        /* スクロールバーのカスタマイズ（Chrome, Safariなど） */
+        .todo-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .todo-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .todo-list::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
         }
 
         .todo-item {
@@ -72,6 +96,35 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: all 0.2s;
+        }
+
+        .todo-item.overdue {
+            background: var(--overdue-bg);
+            border-color: var(--overdue-border);
+        }
+
+        .todo-item.overdue .todo-title {
+            color: var(--overdue-text);
+        }
+
+        .todo-item.overdue .period-badge {
+            background: #ffe4e6;
+            color: var(--overdue-text);
+        }
+
+        .todo-item.approaching {
+            background: var(--approaching-bg);
+            border-color: var(--approaching-border);
+        }
+
+        .todo-item.approaching .todo-title {
+            color: var(--approaching-text);
+        }
+
+        .todo-item.approaching .period-badge {
+            background: #fef9c3;
+            color: var(--approaching-text);
         }
 
         .todo-item:last-child {
@@ -97,6 +150,25 @@
         .todo-title {
             font-weight: 600;
             font-size: 1.1rem;
+        }
+
+        .overdue-label, .approaching-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+
+        .overdue-label {
+            background: var(--danger);
+            color: white;
+        }
+
+        .approaching-label {
+            background: var(--approaching-text);
+            color: white;
         }
 
         .period-badge {
@@ -209,18 +281,34 @@
 <body>
     <div class="container">
         <header>
-            <h1>My Todos</h1>
+            <h1>やることリスト</h1>
         </header>
         
         <ul class="todo-list">
             <% if (todos.length === 0) { %>
                 <div class="empty-state">Todoはありません。新しいタスクを追加しましょう。</div>
             <% } %>
-            <% todos.forEach(todo => { %>
-                <li class="todo-item">
+            <% 
+                const now = new Date();
+                const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+                todos.forEach(todo => { 
+                    const dueDate = new Date(todo.dueDate);
+                    const isOverdue = dueDate < now;
+                    const isApproaching = !isOverdue && dueDate < tomorrow;
+                    
+                    let statusClass = '';
+                    if (isOverdue) statusClass = 'overdue';
+                    else if (isApproaching) statusClass = 'approaching';
+            %>
+                <li class="todo-item <%= statusClass %>">
                     <div class="todo-info">
                         <div class="todo-header">
                             <span class="todo-title"><%= todo.title %></span>
+                            <% if (isOverdue) { %>
+                                <span class="overdue-label">期限切れ</span>
+                            <% } else if (isApproaching) { %>
+                                <span class="approaching-label">期限間近</span>
+                            <% } %>
                             <% if (todo.period && todo.period !== '') { %>
                                 <span class="period-badge"><%= todo.period %></span>
                             <% } %>
