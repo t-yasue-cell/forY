@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>forY - モダンTodo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 2rem 0;
+            line-height: 1.5;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 0 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.025em;
+            color: var(--primary);
+        }
+
+        .todo-list {
+            list-style: none;
+            padding: 0.75rem 1rem;
+            margin: 0;
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .todo-item {
+            background: var(--card-bg);
+            margin-bottom: 0.4rem;
+            padding: 0.8rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .todo-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .todo-item:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .todo-info {
+            flex-grow: 1;
+        }
+
+        .todo-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .todo-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .period-badge {
+            background: #eef2ff;
+            color: var(--primary);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .todo-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: #cbd5e1;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin-left: 1rem;
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+            background: #fef2f2;
+        }
+
+        .add-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            margin-top: 3rem;
+            border: 1px solid var(--border);
+        }
+
+        .add-card h2 {
+            margin: 0 0 1.25rem 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.2s, ring 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.875rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Todos</h1>
+        </header>
+        
+        <ul class="todo-list">
+            <% if (todos.length === 0) { %>
+                <div class="empty-state">Todoはありません。新しいタスクを追加しましょう。</div>
+            <% } %>
+            <% todos.forEach(todo => { %>
+                <li class="todo-item">
+                    <div class="todo-info">
+                        <div class="todo-header">
+                            <span class="todo-title"><%= todo.title %></span>
+                            <% if (todo.period && todo.period !== '') { %>
+                                <span class="period-badge"><%= todo.period %></span>
+                            <% } %>
+                        </div>
+                        <div class="todo-meta">
+                            📅 <%= new Date(todo.dueDate).toLocaleString('ja-JP', { dateStyle: 'medium', timeStyle: 'short' }) %>
+                        </div>
+                    </div>
+                    <!-- /todo/:id を使用した RESTful な削除 -->
+                    <form action="/todo/<%= todo.id %>?_method=DELETE" method="POST" onsubmit="return confirm('削除しますか？')">
+                        <button type="submit" class="delete-btn" title="削除">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        </button>
+                    </form>
+                </li>
+            <% }) %>
+        </ul>
+
+        <div class="add-card">
+            <h2>New Task</h2>
+            <!-- /todos を使用した RESTful な追加 -->
+            <form action="/todos" method="POST">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title" required placeholder="何をする？">
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="time">Time</label>
+                        <input type="time" id="time" name="time" required value="09:00">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="period">Period</label>
+                    <select id="period" name="period">
+                        <option value="auto" selected>✨ 自動判定（時間から計算）</option>
+                        <option value="none">なし</option>
+                        <option value="朝">朝</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="昼">昼</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="放課後">放課後</option>
+                    </select>
+                </div>
+                <button type="submit" class="submit-btn">Add Todo</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+    </script>
+</body>
+</html>
