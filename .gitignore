@@ -22,3 +22,8 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# PostGreSQLReadme
+P_README
+
+/generated/prisma
