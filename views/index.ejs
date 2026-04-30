@@ -35,21 +35,27 @@
             background-color: var(--bg);
             color: var(--text-main);
             margin: 0;
-            padding: 2rem 0;
+            padding: 0;
             line-height: 1.5;
             display: flex;
             justify-content: center;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 900px;
-            padding: 0 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         header {
             text-align: center;
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
+            flex-shrink: 0;
         }
 
         h1 {
@@ -67,10 +73,11 @@
             background: #f1f5f9;
             border: 1px solid var(--border);
             border-radius: 16px;
-            max-height: 420px; /* 6個程度が見える高さ */
+            flex-grow: 1;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--border) transparent;
+            margin-bottom: 1rem;
         }
 
         /* スクロールバーのカスタマイズ（Chrome, Safariなど） */
@@ -204,37 +211,76 @@
 
         .add-card {
             background: var(--card-bg);
-            padding: 1.5rem;
+            padding: 0; /* ヘッダーとボディで個別にパディングを設定 */
             border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            margin-top: 3rem;
+            box-shadow: 0 -4px 6px -1px rgba(0,0,0,0.05);
             border: 1px solid var(--border);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .add-card-header {
+            padding: 1rem 1.25rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            transition: background 0.2s;
+        }
+
+        .add-card-header:hover {
+            background: #f8fafc;
         }
 
         .add-card h2 {
-            margin: 0 0 1.25rem 0;
-            font-size: 1.1rem;
+            margin: 0;
+            font-size: 1rem;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
+        .toggle-icon {
+            color: var(--text-muted);
+            transition: transform 0.3s;
+        }
+
+        .add-card.collapsed .toggle-icon {
+            transform: rotate(-180deg);
+        }
+
+        .add-card-body {
+            padding: 0 1.25rem 1.25rem 1.25rem;
+            max-height: 500px;
+            transition: max-height 0.3s ease-out, opacity 0.2s, padding 0.3s;
+            opacity: 1;
+            overflow: hidden;
+        }
+
+        .add-card.collapsed .add-card-body {
+            max-height: 0;
+            padding-bottom: 0;
+            padding-top: 0;
+            opacity: 0;
+        }
+
         .form-group {
-            margin-bottom: 1.25rem;
+            margin-bottom: 1rem;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
         }
 
         input, select {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.6rem 0.75rem;
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 1rem;
@@ -262,13 +308,21 @@
                 flex: 1 0 100% !important;
             }
             
-            body {
-                padding: 1rem 0;
-            }
-            
             .add-card {
-                padding: 1.25rem;
-                margin-top: 2rem;
+                /* padding: 1rem; は削除。header/bodyで制御するため */
+            }
+
+            .add-card-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .add-card-body {
+                padding: 0 1rem 1rem 1rem;
+            }
+
+            .add-card.collapsed .add-card-body {
+                padding-bottom: 0;
+                padding-top: 0;
             }
         }
 
@@ -276,14 +330,14 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 0.875rem;
+            padding: 0.75rem;
             border-radius: 8px;
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
             width: 100%;
             transition: background 0.2s;
-            margin-top: 0.5rem;
+            margin-top: 0.25rem;
         }
 
         .submit-btn:hover {
@@ -347,48 +401,72 @@
             <% }) %>
         </ul>
 
-        <div class="add-card">
-            <h2>New Task</h2>
-            <!-- /todos を使用した RESTful な追加 -->
-            <form action="/todos" method="POST">
-                <div class="form-group">
-                    <label for="title">Title</label>
-                    <input type="text" id="title" name="title" required placeholder="何をする？">
+        <div class="add-card" id="addCard">
+            <div class="add-card-header" onclick="toggleForm()">
+                <h2>New Task</h2>
+                <div class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
-                <div class="form-row">
-                    <div class="form-group" style="flex: 2;">
-                        <label for="date">Date</label>
-                        <input type="date" id="date" name="date" required>
+            </div>
+            <div class="add-card-body">
+                <!-- /todos を使用した RESTful な追加 -->
+                <form action="/todos" method="POST">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" name="title" required placeholder="何をする？">
                     </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label for="time">Time</label>
-                        <input type="time" id="time" name="time" required value="09:00">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 2;">
+                            <label for="date">Date</label>
+                            <input type="date" id="date" name="date" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label for="time">Time</label>
+                            <input type="time" id="time" name="time" required value="09:00">
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="period">Period</label>
-                    <select id="period" name="period">
-                        <option value="auto" selected>✨ 自動判定（時間から計算）</option>
-                        <option value="none">なし</option>
-                        <option value="朝">朝</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="昼">昼</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="放課後">放課後</option>
-                    </select>
-                </div>
-                <button type="submit" class="submit-btn">Add Todo</button>
-            </form>
+                    <div class="form-group">
+                        <label for="period">Period</label>
+                        <select id="period" name="period">
+                            <option value="auto" selected>✨ 自動判定（時間から計算）</option>
+                            <option value="none">なし</option>
+                            <option value="朝">朝</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="昼">昼</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="放課後">放課後</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="submit-btn">Add Todo</button>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
         document.getElementById('date').valueAsDate = new Date();
+
+        function toggleForm() {
+            const card = document.getElementById('addCard');
+            card.classList.toggle('collapsed');
+            
+            // 状態を保存
+            const isCollapsed = card.classList.contains('collapsed');
+            localStorage.setItem('todo-form-collapsed', isCollapsed);
+        }
+
+        // 初期状態の復元
+        window.addEventListener('DOMContentLoaded', () => {
+            const isCollapsed = localStorage.getItem('todo-form-collapsed') === 'true';
+            if (isCollapsed) {
+                document.getElementById('addCard').classList.add('collapsed');
+            }
+        });
     </script>
 </body>
 </html>
