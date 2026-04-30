@@ -43,7 +43,7 @@
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 900px;
             padding: 0 1rem;
         }
 
@@ -181,8 +181,9 @@
         }
 
         .todo-meta {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            font-size: 1rem;
+            color: var(--text-main);
+            opacity: 0.8;
         }
 
         .delete-btn {
@@ -250,6 +251,25 @@
         .form-row {
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 480px) {
+            .form-row {
+                gap: 0;
+            }
+            .form-row > .form-group {
+                flex: 1 0 100% !important;
+            }
+            
+            body {
+                padding: 1rem 0;
+            }
+            
+            .add-card {
+                padding: 1.25rem;
+                margin-top: 2rem;
+            }
         }
 
         .submit-btn {
