@@ -17,6 +17,8 @@
             --text-muted: #64748b;
             --danger: #ef4444;
             --danger-hover: #dc2626;
+            --success: #22c55e;
+            --success-hover: #16a34a;
             --border: #e2e8f0;
             --overdue-bg: #fff1f2;
             --overdue-border: #fecdd3;
@@ -97,7 +99,7 @@
         .todo-item {
             background: var(--card-bg);
             margin-bottom: 0.4rem;
-            padding: 0.8rem 1.25rem;
+            padding: 1.1rem 1.25rem;
             border-radius: 12px;
             border: 1px solid var(--border);
             display: flex;
@@ -193,20 +195,26 @@
             opacity: 0.8;
         }
 
-        .delete-btn {
-            background: transparent;
-            border: none;
-            color: #cbd5e1;
+        .complete-btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            color: #94a3b8;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
+            padding: 0.4rem;
+            border-radius: 10px;
             transition: all 0.2s;
             margin-left: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .delete-btn:hover {
-            color: var(--danger);
-            background: #fef2f2;
+        .complete-btn:hover {
+            color: var(--success);
+            background: #f0fdf4;
+            border-color: var(--success);
+            box-shadow: 0 2px 4px rgba(34, 197, 94, 0.1);
         }
 
         .add-card {
@@ -391,10 +399,10 @@
                             📅 <%= new Date(todo.dueDate).toLocaleString('ja-JP', { dateStyle: 'medium', timeStyle: 'short' }) %>
                         </div>
                     </div>
-                    <!-- /todo/:id を使用した RESTful な削除 -->
-                    <form action="/todo/<%= todo.id %>?_method=DELETE" method="POST" onsubmit="return confirm('削除しますか？')">
-                        <button type="submit" class="delete-btn" title="削除">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                    <!-- /todo/:id を使用した RESTful な削除（完了として扱う） -->
+                    <form action="/todo/<%= todo.id %>?_method=DELETE" method="POST" onsubmit="return confirm('完了しましたか？')">
+                        <button type="submit" class="complete-btn" title="完了">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         </button>
                     </form>
                 </li>
